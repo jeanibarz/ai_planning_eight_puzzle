@@ -1,0 +1,55 @@
+# depslib dependency file v1.0
+1422564531 source:/home/jean-ibarz/Documents/cpp/eight_puzzle2/main.cpp
+	<iostream>
+	<array>
+	<queue>
+	<vector>
+	<memory>
+	<unordered_set>
+	<Node.h>
+
+1422564638 /home/jean-ibarz/Documents/cpp/eight_puzzle2/include/Node.h
+	<array>
+	<vector>
+	<memory>
+	<utils.h>
+
+1422564624 source:/home/jean-ibarz/Documents/cpp/eight_puzzle2/src/Node.cpp
+	"Node.h"
+	<array>
+	<iostream>
+
+1422536296 /home/jean-ibarz/Documents/cpp/eight_puzzle2/include/utils.h
+	<iostream>
+	<array>
+
+1422481287 source:/home/jean-ibarz/Documents/cpp/eight_puzzle2/src/utils.cpp
+	<utils.h>
+
+1422566597 source:/home/jean-ibarz/Documents/cpp/eight_puzzle2/ai_planning_eight_puzzle/main.cpp
+	<iostream>
+	<array>
+	<queue>
+	<vector>
+	<memory>
+	<unordered_set>
+	<Node.h>
+
+1422564638 /home/jean-ibarz/Documents/cpp/eight_puzzle2/ai_planning_eight_puzzle/include/Node.h
+	<array>
+	<vector>
+	<memory>
+	<utils.h>
+
+1422536296 /home/jean-ibarz/Documents/cpp/eight_puzzle2/ai_planning_eight_puzzle/include/utils.h
+	<iostream>
+	<array>
+
+1422564624 source:/home/jean-ibarz/Documents/cpp/eight_puzzle2/ai_planning_eight_puzzle/src/Node.cpp
+	"Node.h"
+	<array>
+	<iostream>
+
+1422481287 source:/home/jean-ibarz/Documents/cpp/eight_puzzle2/ai_planning_eight_puzzle/src/utils.cpp
+	<utils.h>
+
