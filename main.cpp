@@ -12,16 +12,21 @@ using namespace std;
 
 int searchBestPath(array<uint8_t,9> const & start_grid, array<uint8_t,9> const & goal_grid)
 {
-    shared_ptr<Node> start_node (new Node(start_grid));
-    shared_ptr<Node> goal_node (new Node(goal_grid));
+    cout << "Grille initiale:" << endl << start_grid << endl;
 
-    unordered_set<shared_ptr<Node>, hashNode, compareNode> explored_nodes;
-    priority_queue<shared_ptr<Node>, vector<shared_ptr<Node>>, priorityNode> queued_nodes;
-    vector<shared_ptr<Node>> next_nodes;
+    unique_ptr<Node> start_node (new Node(start_grid));
+    unique_ptr<Node> goal_node (new Node(goal_grid));
 
-    queued_nodes.push(start_node);
+    vector<unique_ptr<Node>> nodes_manager;
+    unordered_set<Node const *, hashNode, compareNode> explored_nodes;
+    priority_queue<Node const *, vector<Node const *>, priorityNode> queued_nodes;
 
-    shared_ptr<Node> current_node;
+    vector<unique_ptr<Node>> next_nodes;
+
+    queued_nodes.push(start_node.get());
+    nodes_manager.push_back(move(start_node));
+
+    Node const * current_node;
 
     while(!queued_nodes.empty()) {
         current_node = queued_nodes.top();
@@ -39,11 +44,12 @@ int searchBestPath(array<uint8_t,9> const & start_grid, array<uint8_t,9> const &
 
         explored_nodes.insert(current_node);
 
-        next_nodes = current_node->successors();
+        next_nodes = current_node->successors(); // gets nodes ownership
         for(uint8_t i = 0; i < next_nodes.size(); ++i)
         {
             next_nodes[i]->setHeuristic();
-            queued_nodes.push(next_nodes[i]);
+            queued_nodes.push(next_nodes[i].get());
+            nodes_manager.push_back(move(next_nodes[i]));
         }
     }
 
@@ -52,16 +58,21 @@ int searchBestPath(array<uint8_t,9> const & start_grid, array<uint8_t,9> const &
 
 int searchDifferentStates(array<uint8_t,9> const & start_grid, uint8_t distance)
 {
-    shared_ptr<Node> start_node (new Node(start_grid));
-    unordered_set<shared_ptr<Node>, hashNode2, compareNode2> explored_nodes;
-    vector<shared_ptr<Node>> solutions;
+    unique_ptr<Node> start_node (new Node(start_grid));
 
-    priority_queue<shared_ptr<Node>, vector<shared_ptr<Node>>, priorityNodeBreadthFirst> queued_nodes;
-    vector<shared_ptr<Node>> next_nodes;
+    vector<unique_ptr<Node>> nodes_manager;
+    unordered_set<Node *, hashNode3, compareNode3> explored_nodes;
+    vector<Node *> solutions;
 
-    queued_nodes.push(start_node);
+    //priority_queue<shared_ptr<Node>, vector<shared_ptr<Node>>, priorityNodeBreadthFirst> queued_nodes;
+    priority_queue<Node *, vector<Node *>, priorityNodeBreadthFirst> queued_nodes;
 
-    shared_ptr<Node> current_node;
+    vector<unique_ptr<Node>> next_nodes;
+
+    queued_nodes.push(start_node.get());
+    nodes_manager.push_back(move(start_node));
+
+    Node * current_node;
 
     while(!queued_nodes.empty())
     {
@@ -79,11 +90,16 @@ int searchDifferentStates(array<uint8_t,9> const & start_grid, uint8_t distance)
         }
 
         next_nodes = current_node->successors();
-        explored_nodes.insert(current_node);
+
+        if(explored_nodes.find(current_node)==explored_nodes.end())
+        {
+            explored_nodes.insert(current_node);
+        }
 
         for(uint8_t i = 0; i < next_nodes.size(); ++i)
         {
-            queued_nodes.push(next_nodes[i]);
+            queued_nodes.push(next_nodes[i].get());
+            nodes_manager.push_back(move(next_nodes[i]));
         }
     }
     /*

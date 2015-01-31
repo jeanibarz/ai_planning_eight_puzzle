@@ -53,3 +53,30 @@
 1422481287 source:/home/jean-ibarz/Documents/cpp/eight_puzzle2/ai_planning_eight_puzzle/src/utils.cpp
 	<utils.h>
 
+1422667820 source:/home/jean-ibarz/Documents/ai_planning/ai_planning_eight_puzzle/main.cpp
+	<iostream>
+	<array>
+	<queue>
+	<vector>
+	<memory>
+	<unordered_set>
+	<Node.h>
+
+1422667775 /home/jean-ibarz/Documents/ai_planning/ai_planning_eight_puzzle/include/Node.h
+	<array>
+	<vector>
+	<memory>
+	<utils.h>
+
+1422645059 /home/jean-ibarz/Documents/ai_planning/ai_planning_eight_puzzle/include/utils.h
+	<iostream>
+	<array>
+
+1422667738 source:/home/jean-ibarz/Documents/ai_planning/ai_planning_eight_puzzle/src/Node.cpp
+	"Node.h"
+	<array>
+	<iostream>
+
+1422645059 source:/home/jean-ibarz/Documents/ai_planning/ai_planning_eight_puzzle/src/utils.cpp
+	<utils.h>
+

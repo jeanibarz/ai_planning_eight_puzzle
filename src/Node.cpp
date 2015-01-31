@@ -76,22 +76,22 @@ void Node::setParentsNodes(vector<shared_ptr<Node>> _parents_nodes)
     parents_nodes = _parents_nodes;
 }
 
-vector<shared_ptr<Node>> Node::successors() const
+vector<unique_ptr<Node>> Node::successors() const
 {
-    vector<shared_ptr<Node>> next_nodes;
+    vector<unique_ptr<Node>> next_nodes;
 
     uint8_t const col=blank_cell%3;
     uint8_t const row=blank_cell/3;
 
-    if(col>0) next_nodes.push_back(moveCell(Actions::MOVE_RIGHT));
-    if(col<2) next_nodes.push_back(moveCell(Actions::MOVE_LEFT));
-    if(row>0) next_nodes.push_back(moveCell(Actions::MOVE_DOWN));
-    if(row<2) next_nodes.push_back(moveCell(Actions::MOVE_UP));
+    if(col>0) next_nodes.push_back(move(moveCell(Actions::MOVE_RIGHT)));
+    if(col<2) next_nodes.push_back(move(moveCell(Actions::MOVE_LEFT)));
+    if(row>0) next_nodes.push_back(move(moveCell(Actions::MOVE_DOWN)));
+    if(row<2) next_nodes.push_back(move(moveCell(Actions::MOVE_UP)));
 
     return next_nodes;
 }
 
-shared_ptr<Node> Node::moveCell(Actions action) const
+unique_ptr<Node> Node::moveCell(Actions action) const
 {
     array<uint8_t,9> initial_grid = grid;
     array<uint8_t,9> new_grid = grid;
@@ -117,11 +117,11 @@ shared_ptr<Node> Node::moveCell(Actions action) const
     new_grid[moved_cell]=0;
     new_blank_cell=moved_cell;
 
-    shared_ptr<Node> new_node(new Node(new_grid, new_blank_cell, path_cost+1));
+    unique_ptr<Node> new_node(new Node(new_grid, new_blank_cell, path_cost+1));
 
     if(new_grid == initial_grid) cout << "ERREUR" << endl;
 
-    return new_node;
+    return move(new_node);
 }
 
 Node::Node(Node const & n)
@@ -156,17 +156,17 @@ Node::~Node()
     //cout << "node destructor" << endl;
 }
 
-bool priorityNode::operator()(shared_ptr<Node const> const n1, shared_ptr<Node const> const n2) const
+bool priorityNode::operator()(Node const * const n1, Node const * const n2) const
 {
     return (n1->getHeuristic() >= n2->getHeuristic()); // prioritize low path cost
 }
 
-bool priorityNodeBreadthFirst::operator()(shared_ptr<Node const> const n1, shared_ptr<Node const> const n2) const
+bool priorityNodeBreadthFirst::operator()(Node const * n1, Node const * n2) const
 {
     return (n1->getPathCost() >= n2->getPathCost());
 }
 
-size_t hashNode::operator()(shared_ptr<Node const> const node) const
+size_t hashNode::operator()(Node const * node) const
 {
     size_t value = 0;
     array<uint8_t,9> grid = node->getGrid();
@@ -181,7 +181,7 @@ size_t hashNode::operator()(shared_ptr<Node const> const node) const
     return value;
 }
 
-size_t hashNode2::operator()(shared_ptr<Node const> const node) const
+size_t hashNode2::operator()(Node const * node) const
 {
     size_t value = 0;
     array<uint8_t,9> grid = node->getGrid();
@@ -194,7 +194,20 @@ size_t hashNode2::operator()(shared_ptr<Node const> const node) const
     return value;
 }
 
-bool compareNode::operator()(shared_ptr<Node const> const n1, shared_ptr<Node const> const n2) const
+size_t hashNode3::operator()(Node const * node) const
+{
+    size_t value = 0;
+    array<uint8_t,9> grid = node->getGrid();
+
+    for(int i = 0; i < 9; ++i)
+    {
+        value ^= grid[i] << (3*i);
+    }
+
+    return value;
+}
+
+bool compareNode::operator()(Node const * n1, Node const * n2) const
 {
     array<uint8_t,9> const grid1 = n1->getGrid();
     array<uint8_t,9> const grid2 = n2->getGrid();
@@ -209,7 +222,20 @@ bool compareNode::operator()(shared_ptr<Node const> const n1, shared_ptr<Node co
     return true;
 }
 
-bool compareNode2::operator()(shared_ptr<Node const> const n1, shared_ptr<Node const> const n2) const
+bool compareNode2::operator()(Node const * n1, Node const * n2) const
+{
+    array<uint8_t,9> const grid1 = n1->getGrid();
+    array<uint8_t,9> const grid2 = n2->getGrid();
+
+    for(int i = 0; i < 9; ++i)
+    {
+        if(grid1[i]!=grid2[i]) return false;
+    }
+
+    return true;
+}
+
+bool compareNode3::operator()(Node const * n1, Node const * n2) const
 {
     array<uint8_t,9> const grid1 = n1->getGrid();
     array<uint8_t,9> const grid2 = n2->getGrid();
