@@ -12,21 +12,17 @@ using namespace std;
 
 int searchBestPath(array<uint8_t,9> const & start_grid, array<uint8_t,9> const & goal_grid)
 {
-    cout << "Grille initiale:" << endl << start_grid << endl;
+    unique_ptr<Node const> start_node (new Node(start_grid));
+    unique_ptr<Node const> goal_node (new Node(goal_grid));
 
-    unique_ptr<Node> start_node (new Node(start_grid));
-    unique_ptr<Node> goal_node (new Node(goal_grid));
-
-    vector<unique_ptr<Node>> nodes_manager;
+    vector<unique_ptr<Node const>> nodes_manager;
     unordered_set<Node const *, hashNode, compareNode> explored_nodes;
     priority_queue<Node const *, vector<Node const *>, priorityNode> queued_nodes;
 
-    vector<unique_ptr<Node>> next_nodes;
-
     queued_nodes.push(start_node.get());
-    nodes_manager.push_back(move(start_node));
 
     Node const * current_node;
+    vector<unique_ptr<Node>> next_nodes;
 
     while(!queued_nodes.empty()) {
         current_node = queued_nodes.top();
@@ -56,23 +52,19 @@ int searchBestPath(array<uint8_t,9> const & start_grid, array<uint8_t,9> const &
     return -1;
 }
 
-int searchDifferentStates(array<uint8_t,9> const & start_grid, uint8_t distance)
+int searchDifferentStates(array<uint8_t,9> const & start_grid, uint8_t const distance)
 {
-    unique_ptr<Node> start_node (new Node(start_grid));
+    unique_ptr<Node const> start_node (new Node(start_grid));
 
-    vector<unique_ptr<Node>> nodes_manager;
-    unordered_set<Node *, hashNode3, compareNode3> explored_nodes;
-    vector<Node *> solutions;
-
-    //priority_queue<shared_ptr<Node>, vector<shared_ptr<Node>>, priorityNodeBreadthFirst> queued_nodes;
-    priority_queue<Node *, vector<Node *>, priorityNodeBreadthFirst> queued_nodes;
-
-    vector<unique_ptr<Node>> next_nodes;
+    vector<unique_ptr<Node const>> nodes_manager;
+    unordered_set<Node const *, hashNode3, compareNode3> explored_nodes;
+    priority_queue<Node const *, vector<Node const *>, priorityNodeBreadthFirst> queued_nodes;
+    vector<Node const *> solutions;
 
     queued_nodes.push(start_node.get());
-    nodes_manager.push_back(move(start_node));
 
-    Node * current_node;
+    Node const * current_node;
+    vector<unique_ptr<Node>> next_nodes;
 
     while(!queued_nodes.empty())
     {
