@@ -53,16 +53,17 @@
 1422481287 source:/home/jean-ibarz/Documents/cpp/eight_puzzle2/ai_planning_eight_puzzle/src/utils.cpp
 	<utils.h>
 
-1422668834 source:/home/jean-ibarz/Documents/ai_planning/ai_planning_eight_puzzle/main.cpp
+1422727431 source:/home/jean-ibarz/Documents/ai_planning/ai_planning_eight_puzzle/main.cpp
 	<iostream>
 	<array>
 	<queue>
 	<vector>
 	<memory>
 	<unordered_set>
+	<unordered_map>
 	<Node.h>
 
-1422667775 /home/jean-ibarz/Documents/ai_planning/ai_planning_eight_puzzle/include/Node.h
+1422719227 /home/jean-ibarz/Documents/ai_planning/ai_planning_eight_puzzle/include/Node.h
 	<array>
 	<vector>
 	<memory>
@@ -72,7 +73,7 @@
 	<iostream>
 	<array>
 
-1422667738 source:/home/jean-ibarz/Documents/ai_planning/ai_planning_eight_puzzle/src/Node.cpp
+1422719395 source:/home/jean-ibarz/Documents/ai_planning/ai_planning_eight_puzzle/src/Node.cpp
 	"Node.h"
 	<array>
 	<iostream>

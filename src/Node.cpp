@@ -7,7 +7,7 @@ using namespace std;
 
 array<uint8_t,9> Node::getGrid() const
 {
-    return grid;
+    return array<uint8_t,9>(grid);
 }
 
 uint8_t Node::getBlankCell() const
@@ -24,12 +24,12 @@ uint16_t Node::getHeuristic() const
 {
     return heuristic;
 }
-
+/*
 vector<shared_ptr<Node>> Node::getParentsNodes() const
 {
     return vector<shared_ptr<Node>>(parents_nodes);
 }
-
+*/
 void Node::setBlankCell()
 {
     for(uint8_t i = 0; i < 9; ++i)
@@ -70,11 +70,11 @@ void Node::setHeuristic()
 */
     heuristic = h+g;
 }
-
+/*
 void Node::setParentsNodes(vector<shared_ptr<Node>> _parents_nodes)
 {
     parents_nodes = _parents_nodes;
-}
+}*/
 
 vector<unique_ptr<Node>> Node::successors() const
 {
@@ -83,10 +83,10 @@ vector<unique_ptr<Node>> Node::successors() const
     uint8_t const col=blank_cell%3;
     uint8_t const row=blank_cell/3;
 
-    if(col>0) next_nodes.push_back(move(moveCell(Actions::MOVE_RIGHT)));
-    if(col<2) next_nodes.push_back(move(moveCell(Actions::MOVE_LEFT)));
-    if(row>0) next_nodes.push_back(move(moveCell(Actions::MOVE_DOWN)));
-    if(row<2) next_nodes.push_back(move(moveCell(Actions::MOVE_UP)));
+    if(col>0) next_nodes.push_back(moveCell(Actions::MOVE_RIGHT));
+    if(col<2) next_nodes.push_back(moveCell(Actions::MOVE_LEFT));
+    if(row>0) next_nodes.push_back(moveCell(Actions::MOVE_DOWN));
+    if(row<2) next_nodes.push_back(moveCell(Actions::MOVE_UP));
 
     return next_nodes;
 }
@@ -121,7 +121,7 @@ unique_ptr<Node> Node::moveCell(Actions action) const
 
     if(new_grid == initial_grid) cout << "ERREUR" << endl;
 
-    return move(new_node);
+    return new_node;
 }
 
 Node::Node(Node const & n)
@@ -156,17 +156,30 @@ Node::~Node()
     //cout << "node destructor" << endl;
 }
 
-bool priorityNode::operator()(Node const * const n1, Node const * const n2) const
+bool priorityNodeLowerHeuristic::operator()(Node const * const n1, Node const * const n2) const
 {
     return (n1->getHeuristic() >= n2->getHeuristic()); // prioritize low path cost
 }
 
-bool priorityNodeBreadthFirst::operator()(Node const * n1, Node const * n2) const
+bool priorityNodeLowerCost::operator()(Node const * n1, Node const * n2) const
 {
     return (n1->getPathCost() >= n2->getPathCost());
 }
 
-size_t hashNode::operator()(Node const * node) const
+size_t hashNodeGridOnly::operator()(Node const * node) const
+{
+    size_t value = 0;
+    array<uint8_t,9> grid = node->getGrid();
+
+    for(int i = 0; i < 9; ++i)
+    {
+        value ^= grid[i] << (3*i);
+    }
+
+    return value;
+}
+
+size_t hashNodeGridAndCost::operator()(Node const * node) const
 {
     size_t value = 0;
     array<uint8_t,9> grid = node->getGrid();
@@ -181,33 +194,20 @@ size_t hashNode::operator()(Node const * node) const
     return value;
 }
 
-size_t hashNode2::operator()(Node const * node) const
+bool compareNodeGridOnly::operator()(Node const * n1, Node const * n2) const
 {
-    size_t value = 0;
-    array<uint8_t,9> grid = node->getGrid();
+    array<uint8_t,9> const grid1 = n1->getGrid();
+    array<uint8_t,9> const grid2 = n2->getGrid();
 
     for(int i = 0; i < 9; ++i)
     {
-        value ^= grid[i] << (3*i);
+        if(grid1[i]!=grid2[i]) return false;
     }
 
-    return value;
+    return true;
 }
 
-size_t hashNode3::operator()(Node const * node) const
-{
-    size_t value = 0;
-    array<uint8_t,9> grid = node->getGrid();
-
-    for(int i = 0; i < 9; ++i)
-    {
-        value ^= grid[i] << (3*i);
-    }
-
-    return value;
-}
-
-bool compareNode::operator()(Node const * n1, Node const * n2) const
+bool compareNodeGridAndCost::operator()(Node const * n1, Node const * n2) const
 {
     array<uint8_t,9> const grid1 = n1->getGrid();
     array<uint8_t,9> const grid2 = n2->getGrid();
@@ -218,32 +218,6 @@ bool compareNode::operator()(Node const * n1, Node const * n2) const
     }
 
     if (n1->getPathCost() != n2->getPathCost()) return false;
-
-    return true;
-}
-
-bool compareNode2::operator()(Node const * n1, Node const * n2) const
-{
-    array<uint8_t,9> const grid1 = n1->getGrid();
-    array<uint8_t,9> const grid2 = n2->getGrid();
-
-    for(int i = 0; i < 9; ++i)
-    {
-        if(grid1[i]!=grid2[i]) return false;
-    }
-
-    return true;
-}
-
-bool compareNode3::operator()(Node const * n1, Node const * n2) const
-{
-    array<uint8_t,9> const grid1 = n1->getGrid();
-    array<uint8_t,9> const grid2 = n2->getGrid();
-
-    for(int i = 0; i < 9; ++i)
-    {
-        if(grid1[i]!=grid2[i]) return false;
-    }
 
     return true;
 }

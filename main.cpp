@@ -5,6 +5,7 @@
 #include <vector>
 #include <memory>
 #include <unordered_set>
+#include <unordered_map>
 
 #include <Node.h>
 
@@ -16,8 +17,8 @@ int searchBestPath(array<uint8_t,9> const & start_grid, array<uint8_t,9> const &
     unique_ptr<Node const> goal_node (new Node(goal_grid));
 
     vector<unique_ptr<Node const>> nodes_manager;
-    unordered_set<Node const *, hashNode, compareNode> explored_nodes;
-    priority_queue<Node const *, vector<Node const *>, priorityNode> queued_nodes;
+    unordered_set<Node const *, hashNodeGridAndCost, compareNodeGridAndCost> explored_nodes;
+    priority_queue<Node const *, vector<Node const *>, priorityNodeLowerHeuristic> queued_nodes;
 
     queued_nodes.push(start_node.get());
 
@@ -45,7 +46,7 @@ int searchBestPath(array<uint8_t,9> const & start_grid, array<uint8_t,9> const &
         {
             next_nodes[i]->setHeuristic();
             queued_nodes.push(next_nodes[i].get());
-            nodes_manager.push_back(move(next_nodes[i]));
+            nodes_manager.emplace_back(move(next_nodes[i]));
         }
     }
 
@@ -54,14 +55,15 @@ int searchBestPath(array<uint8_t,9> const & start_grid, array<uint8_t,9> const &
 
 int searchDifferentStates(array<uint8_t,9> const & start_grid, uint8_t const distance)
 {
-    unique_ptr<Node const> start_node (new Node(start_grid));
+    unique_ptr<Node const> start_node(new Node(start_grid));
 
     vector<unique_ptr<Node const>> nodes_manager;
-    unordered_set<Node const *, hashNode3, compareNode3> explored_nodes;
-    priority_queue<Node const *, vector<Node const *>, priorityNodeBreadthFirst> queued_nodes;
+    unordered_set<Node const *, hashNodeGridOnly, compareNodeGridOnly> explored_nodes;
+    priority_queue<Node const *, vector<Node const *>, priorityNodeLowerCost> queued_nodes;
     vector<Node const *> solutions;
 
     queued_nodes.push(start_node.get());
+    nodes_manager.emplace_back(move(start_node));
 
     Node const * current_node;
     vector<unique_ptr<Node>> next_nodes;
@@ -75,38 +77,28 @@ int searchDifferentStates(array<uint8_t,9> const & start_grid, uint8_t const dis
         {
             continue;
         }
+
+        explored_nodes.insert(current_node);
+
         if(current_node->getPathCost() == distance)
         {
-            solutions.push_back(current_node);
+            solutions.emplace_back(current_node);
             continue;
         }
 
         next_nodes = current_node->successors();
 
-        if(explored_nodes.find(current_node)==explored_nodes.end())
-        {
-            explored_nodes.insert(current_node);
-        }
-
         for(uint8_t i = 0; i < next_nodes.size(); ++i)
         {
+            if(explored_nodes.find(next_nodes[i].get())!=explored_nodes.end()) continue;
+
             queued_nodes.push(next_nodes[i].get());
-            nodes_manager.push_back(move(next_nodes[i]));
+            unique_ptr<Node> my_node = move(next_nodes[i]);
+            nodes_manager.emplace_back(move(my_node));
         }
     }
-    /*
-    // RANDOM (NOT EXACTLY) CHECKING TO SEE IF SOME STATES FOUND ARE EXACTLY AT <DISTANCE> STEPS AWAY FROM INITIAL STATE
-    for(int i = 0; i < solutions.size(); ++i)
-    {
-        if(i%500>0) continue;
 
-        int bestPath = searchBestPath(start_grid, solutions[i]->getGrid());
-        if(bestPath != distance)
-        {
-            cout << "Optimal solution: " << bestPath << endl;
-            cout << "Grid: " << endl << solutions[i]->getGrid() << endl;
-        }
-    }*/
+    cout << "Nodes:" << nodes_manager.size() << endl;
 
     return solutions.size();
 }
@@ -118,7 +110,7 @@ int main()
     cout << "Q2: " << searchBestPath(array<uint8_t,9> { 8,1,7,4,5,6,2,0,3 }, array<uint8_t,9> { 0,1,2,3,4,5,6,7,8 }) << endl;
     // Last answer : 25
     cout << "Q3: " << searchDifferentStates(array<uint8_t,9> { 0,1,2,3,4,5,6,7,8 }, 27) << endl;
-    // Last answer : 11786
+    // Last answer : 6274
 
     return 0;
 }
